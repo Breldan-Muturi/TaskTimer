@@ -13,7 +13,7 @@ The only class that should use this is the [AppProvider].
 private const val TAG = "AppDatabase"
 private const val  DATABASE_NAME = "TaskTimer.db"
 private const val  DATABASE_VERSION = 3
-internal class AppDatabase constructor (context: Context): SQLiteOpenHelper(context, DATABASE_NAME, null, DATABASE_VERSION){
+internal class AppDatabase private constructor (context: Context): SQLiteOpenHelper(context, DATABASE_NAME, null, DATABASE_VERSION){
     init {
         Log.d(TAG, "AppDatabase: initialising")
     }
@@ -32,4 +32,16 @@ internal class AppDatabase constructor (context: Context): SQLiteOpenHelper(cont
     override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
+
+   companion object: SingletonHolder<AppDatabase, Context>(::AppDatabase)
+
+//    companion object {
+//        @Volatile
+//        private var instance: AppDatabase? = null
+//
+//        fun getInstance(context: Context): AppDatabase =
+//            instance ?: synchronized(this){
+//                instance ?: AppDatabase(context).also { instance = it }
+//            }
+//    }
 }
