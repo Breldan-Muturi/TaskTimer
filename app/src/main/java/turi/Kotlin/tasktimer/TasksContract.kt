@@ -2,7 +2,7 @@ package turi.Kotlin.tasktimer
 
 import android.provider.BaseColumns
 
-object TaskContract {
+object TasksContract {
     internal const val TABLE_NAME = "Task"
     //Task fields
     const val ID = BaseColumns._ID

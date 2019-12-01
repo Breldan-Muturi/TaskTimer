@@ -18,11 +18,18 @@ internal class AppDatabase constructor (context: Context): SQLiteOpenHelper(cont
         Log.d(TAG, "AppDatabase: initialising")
     }
 
-    override fun onCreate(db: SQLiteDatabase?) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    override fun onCreate(db: SQLiteDatabase) {
+        Log.d(TAG, "onCreate: starts")
+        val sSQL = """CREATE TABLE ${TasksContract.TABLE_NAME} (
+            ${TasksContract.Columns.ID} INTEGER PRIMARY KEY NOT NULL,
+            ${TasksContract.Columns.TASK_NAME} TEXT NOT NULL,
+            ${TasksContract.Columns.TASK_DESCRIPTION} TEXT,
+            ${TasksContract.Columns.TASK_SORT_ORDER} INTEGER;""".replaceIndent( " ")
+        Log.d(TAG, sSQL)
+        db.execSQL(sSQL)
     }
 
-    override fun onUpgrade(db: SQLiteDatabase?, oldVersion: Int, newVersion: Int) {
+    override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 }
