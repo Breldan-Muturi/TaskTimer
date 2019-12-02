@@ -4,6 +4,7 @@ import android.content.ContentProvider
 import android.content.ContentValues
 import android.content.UriMatcher
 import android.database.Cursor
+import android.database.SQLException
 import android.database.sqlite.SQLiteQueryBuilder
 import android.net.Uri
 import android.util.Log
@@ -113,7 +114,34 @@ class AppProvider : ContentProvider() {
     }
 
     override fun insert(uri: Uri, values: ContentValues?): Uri {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        Log.d(TAG, "query: called with uri $uri")
+        val match = uriMatcher.match(uri)
+        Log.d(TAG, "query: match is $match")
+        val recordId: Long
+        val returnUri: Uri
+        when (match) {
+            TASKS -> {
+                val db = AppDatabase.getInstance(context!!).writableDatabase
+                recordId = db.insert(TasksContract.TABLE_NAME, null, values)
+                if (recordId != -1L){
+                    returnUri = TasksContract.buildUriFromId(recordId)
+                } else {
+                    throw SQLException("Failed to insert, Uri was $uri")
+                }
+            }
+            TIMINGS -> {
+                val db = AppDatabase.getInstance(context!!).writableDatabase
+                recordId = db.insert(TimingsContract.TABLE_NAME, null, values)
+                if (recordId != -1L){
+                    returnUri = TimingsContract.buildUriFromId(recordId)
+                } else {
+                    throw SQLException("Failed to insert, Uri was $uri")
+                }
+            }
+            else -> throw java.lang.IllegalArgumentException("Unknown uri $uri")
+        }
+        Log.d(TAG, "Exiting insert, returning $returnUri")
+        return returnUri
     }
 
     override fun update(
