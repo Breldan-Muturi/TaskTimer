@@ -31,8 +31,8 @@ class AppProvider : ContentProvider() {
         matcher.addURI(CONTENT_AUTHORITY, TasksContract.TABLE_NAME, TASKS);
         //e.g content://turi.Kotlin.tasktimer.provider/Tasks/8
         matcher.addURI(CONTENT_AUTHORITY, "${TasksContract.TABLE_NAME}/#", TASKS_ID)
-//        matcher.addURI(CONTENT_AUTHORITY, TimingsContract.TABLE_NAME, TIMINGS);
-//        matcher.addURI(CONTENT_AUTHORITY, "${TimingsContract.TABLE_NAME}/#", TIMINGS_ID)
+        matcher.addURI(CONTENT_AUTHORITY, TimingsContract.TABLE_NAME, TIMINGS);
+        matcher.addURI(CONTENT_AUTHORITY, "${TimingsContract.TABLE_NAME}/#", TIMINGS_ID)
 //        matcher.addURI(CONTENT_AUTHORITY, DuratoionsContract.TABLE_NAME, TASK_DURATIONS);
 //        matcher.addURI(CONTENT_AUTHORITY, "${DuratoionsContract.TABLE_NAME}/#", TASK_DURATIONS_ID)
         return matcher
@@ -44,8 +44,23 @@ class AppProvider : ContentProvider() {
     }
 
     override fun getType(uri: Uri): String {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
+        val match = uriMatcher.match(uri)
+
+        return when (match) {
+            TASKS -> TasksContract.CONTENT_TYPE
+
+            TASKS_ID -> TasksContract.CONTENT_ITEM_TYPE
+
+            TIMINGS -> TimingsContract.CONTENT_TYPE
+
+            TIMINGS_ID -> TimingsContract.CONTENT_ITEM_TYPE
+//
+//            TASK_DURATIONS -> DurationsContract.CONTENT_TYPE
+//
+//            TASK_DURATIONS_ID -> DurationsContract.CONTENT_ITEM_TYPE
+
+            else -> throw IllegalArgumentException("unknown Uri: $uri")
+        }    }
 
     override fun query(
         uri: Uri,
@@ -68,14 +83,14 @@ class AppProvider : ContentProvider() {
                 queryBuilder.appendWhereEscapeString("$taskId")       // <-- change method
             }
 
-//            TIMINGS -> queryBuilder.tables = TimingsContract.TABLE_NAME
-//
-//            TIMINGS_ID -> {
-//                queryBuilder.tables = TimingsContract.TABLE_NAME
-//                val timingId = TimingsContract.getId(uri)
-//                queryBuilder.appendWhere("${TimingsContract.Columns.ID} = ")   // <-- and here
-//                queryBuilder.appendWhereEscapeString("$timingId")   // <-- and here
-//            }
+            TIMINGS -> queryBuilder.tables = TimingsContract.TABLE_NAME
+
+            TIMINGS_ID -> {
+                queryBuilder.tables = TimingsContract.TABLE_NAME
+                val timingId = TimingsContract.getId(uri)
+                queryBuilder.appendWhere("${TimingsContract.Columns.ID} = ")   // <-- and here
+                queryBuilder.appendWhereEscapeString("$timingId")   // <-- and here
+            }
 //
 //            TASK_DURATIONS -> queryBuilder.tables = DurationsContract.TABLE_NAME
 //
