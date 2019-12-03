@@ -12,4 +12,8 @@
     <string name="no_task_message">No Task Selected</string>
     <string name="edit_button_description">Button to edit a Task\'s description</string>
     <string name="delete_button_details">Button to delete Tasks</string>
+    <string name="hint_task_description">Task description (optional)</string>
+    <string name="hint_task_name">Task name: required</string>
+    <string name="hint_sortorder">Priority: sorts low to high</string>
+    <string name="addedit_save">SAVE</string>
 </resources>
