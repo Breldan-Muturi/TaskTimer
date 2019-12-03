@@ -39,5 +39,5 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         android:drawableStart="@android:drawable/ic_menu_save"
-        tools:text="@string/addedit_save" />
+        android:text="@string/addedit_save" />
 </LinearLayout>

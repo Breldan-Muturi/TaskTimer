@@ -9,32 +9,17 @@ import android.view.MenuItem
 import kotlinx.android.synthetic.main.activity_main.*
 
 private const val TAG = "MainActivity"
-class MainActivity : AppCompatActivity() {
+
+class MainActivity : AppCompatActivity(), AddEditFragment.OnSaveClicked {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         setSupportActionBar(toolbar)
+    }
 
-        val projection = arrayOf(TasksContract.Columns.TASK_NAME, TasksContract.Columns.TASK_SORT_ORDER)
-        val sortColumn = TasksContract.Columns.TASK_SORT_ORDER
-        val cursor = contentResolver.query(TasksContract.buildUriFromId(2 ), projection,null,null,sortColumn)
-        Log.d(TAG, "******************************")
-        cursor?.use {
-            while (it.moveToNext()){
-                //Cycle through all records
-                with (cursor) {
-//                    val id = (0)
-                    val name = getString(0)
-//                    val description = getString(2)
-                    val sortOrder = getString(1)
-                    val result = "Name: $name sortOrder: $sortOrder"
-                    Log.d(TAG, "onCreate: reading data $result")
-                }
-            }
-        }
-
-        Log.d(TAG, "******************************")
+    override fun onSaveClicked() {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -47,9 +32,20 @@ class MainActivity : AppCompatActivity() {
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
-        return when (item.itemId) {
-            R.id.menumain_settings -> true
-            else -> super.onOptionsItemSelected(item)
+        when (item.itemId) {
+            R.id.menumain_addTask -> taskEditRequest(null)
+//            R.id.menumain_settings -> true
         }
+        return super.onOptionsItemSelected(item)
+    }
+
+    private fun taskEditRequest(task: Task?) {
+        Log.d(TAG, "taskEditRequest: starts")
+//      Create a new fragment for editing the task
+        val newFragment = AddEditFragment.newInstance(task)
+        supportFragmentManager.beginTransaction()
+            .replace(R.id.fragment, newFragment)
+            .commit()
+        Log.d(TAG, "Exiting taskEditRequest")
     }
 }
