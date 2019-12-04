@@ -18,10 +18,12 @@ class MainActivity : AppCompatActivity(), AddEditFragment.OnSaveClicked {
     private var mTwoPane = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        Log.d(TAG, "onCreate: starts")
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         setSupportActionBar(toolbar)
         mTwoPane = resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
+        Log.d(TAG, "onCreate: twoPane is $mTwoPane")
         var fragment = supportFragmentManager.findFragmentById(R.id.task_details_container)
         if (fragment != null) {
 //            There was an existing fragment to edit a task, make sure the panes are set correctly
@@ -29,8 +31,8 @@ class MainActivity : AppCompatActivity(), AddEditFragment.OnSaveClicked {
         } else {
             task_details_container.visibility = if (mTwoPane) View.INVISIBLE else View.GONE
             mainFragment.view?.visibility = View.VISIBLE
-
         }
+        Log.d(TAG, "onCreate: finished")
     }
 
     private fun showEditPane() {
@@ -85,5 +87,39 @@ class MainActivity : AppCompatActivity(), AddEditFragment.OnSaveClicked {
             .commit()
         showEditPane()
         Log.d(TAG, "Exiting taskEditRequest")
+    }
+    override fun onStart() {
+        Log.d(TAG, "onStart: called")
+        super.onStart()
+    }
+
+    override fun onRestoreInstanceState(savedInstanceState: Bundle?) {
+        Log.d(TAG, "onRestoreInstanceState: called")
+        super.onRestoreInstanceState(savedInstanceState)
+    }
+
+    override fun onResume() {
+        Log.d(TAG, "onResume: called")
+        super.onResume()
+    }
+
+    override fun onPause() {
+        Log.d(TAG, "onPause: called")
+        super.onPause()
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        Log.d(TAG, "onSaveInstanceState: called")
+        super.onSaveInstanceState(outState)
+    }
+
+    override fun onStop() {
+        Log.d(TAG, "onStop: called")
+        super.onStop()
+    }
+
+    override fun onDestroy() {
+        Log.d(TAG, "onDestroy: called")
+        super.onDestroy()
     }
 }
