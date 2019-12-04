@@ -7,6 +7,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.app.AppCompatActivity
 import kotlinx.android.synthetic.main.fragment_add_edit.*
 
 private const val TAG = "AddEditFragment"
@@ -43,6 +44,10 @@ class AddEditFragment : Fragment() {
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         Log.d(TAG, "onActivityCreated: starts")
         super.onActivityCreated(savedInstanceState)
+        if (listener is AppCompatActivity) {
+            val actionBar = (listener as AppCompatActivity?)?.supportActionBar
+            actionBar?.setDisplayHomeAsUpEnabled(true)
+        }
         addedit_save.setOnClickListener {
             listener?.onSaveClicked()
         }

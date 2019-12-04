@@ -23,7 +23,7 @@ class MainActivity : AppCompatActivity(), AddEditFragment.OnSaveClicked {
         setContentView(R.layout.activity_main)
         setSupportActionBar(toolbar)
         mTwoPane = resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
-        Log.d(TAG, "onCreate: twoPane is $mTwoPane")
+        Log.d(TAG, "onCreate: twoPane is $mTwoPane  ")
         var fragment = supportFragmentManager.findFragmentById(R.id.task_details_container)
         if (fragment != null) {
 //            There was an existing fragment to edit a task, make sure the panes are set correctly
