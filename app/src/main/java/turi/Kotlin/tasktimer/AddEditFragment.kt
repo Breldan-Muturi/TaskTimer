@@ -1,5 +1,6 @@
 package turi.Kotlin.tasktimer
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Bundle
 import android.util.Log
@@ -40,6 +41,23 @@ class AddEditFragment : Fragment() {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_add_edit, container, false)
     }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        Log.d(TAG, "onViewCreated: called")
+        if (savedInstanceState == null) {
+            val task = task
+            if (task != null) {
+                Log.d(TAG, "onViewCreated: task details found editing task ${task.id}")
+                addedit_name.setText(task.name)
+                addedit_description.setText(task.description)
+                addedit_sortorder.setText(task.sortOrder.toString())
+            } else {
+//            No task, so we must be adding a new task
+                Log.d(TAG, "onViewCreated: no records adding a new record")
+            }
+        }
+    }
+
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         Log.d(TAG, "onActivityCreated: starts")
@@ -99,11 +117,6 @@ class AddEditFragment : Fragment() {
                 }
             }
     }
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        Log.d(TAG, "onViewCreated: called")
-        super.onViewCreated(view, savedInstanceState)
-    }
-
     override fun onViewStateRestored(savedInstanceState: Bundle?) {
         Log.d(TAG, "onViewStateRestored: called")
         super.onViewStateRestored(savedInstanceState)
