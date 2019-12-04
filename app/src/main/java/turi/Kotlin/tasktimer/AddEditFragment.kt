@@ -1,6 +1,7 @@
 package turi.Kotlin.tasktimer
 
 import android.annotation.SuppressLint
+import android.content.ContentValues
 import android.content.Context
 import android.os.Bundle
 import android.util.Log
@@ -58,6 +59,56 @@ class AddEditFragment : Fragment() {
         }
     }
 
+    private fun saveTask() {
+//        Update the database if at least one field is changed
+//        There is no need to hit the database unless this has happened
+        val sortOrder = if (addedit_sortorder.text.isNotEmpty()) {
+            Integer.parseInt(addedit_sortorder.text.toString())
+        } else {
+            0
+        }
+        val values = ContentValues()
+        val task = task
+
+        if (task != null) {
+            Log.d(TAG, "saveTask: updating an existing task")
+            if (addedit_name.text.toString() != task.name) {
+                values.put(TasksContract.Columns.TASK_NAME, addedit_name.text.toString())
+            }
+            if (addedit_description.text.toString() != task.description) {
+                values.put(
+                    TasksContract.Columns.TASK_DESCRIPTION,
+                    addedit_description.text.toString()
+                )
+            }
+            if (sortOrder != task.sortOrder) {
+                values.put(TasksContract.Columns.TASK_SORT_ORDER, sortOrder)
+            }
+            if (values.size() != 0) {
+                Log.d(TAG, "saveTask: updating task")
+                activity?.contentResolver?.update(
+                    TasksContract.buildUriFromId(task.id),
+                    values, null, null
+                )
+            }
+        } else {
+            Log.d(TAG, "saveTask: adding a new task")
+            if (addedit_name.text.isNotEmpty()) {
+                values.put(TasksContract.Columns.TASK_NAME, addedit_name.text.toString())
+                if (addedit_description.text.isNotEmpty()) {
+                    values.put(
+                        TasksContract.Columns.TASK_DESCRIPTION,
+                        addedit_description.text.toString()
+                    )
+                }
+                values.put(
+                    TasksContract.Columns.TASK_SORT_ORDER,
+                    sortOrder
+                ) // defaults to zero if empty
+                activity?.contentResolver?.insert(TasksContract.CONTENT_URI, values)
+            }
+        }
+    }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         Log.d(TAG, "onActivityCreated: starts")
@@ -67,9 +118,11 @@ class AddEditFragment : Fragment() {
             actionBar?.setDisplayHomeAsUpEnabled(true)
         }
         addedit_save.setOnClickListener {
+            saveTask()
             listener?.onSaveClicked()
         }
     }
+
     override fun onAttach(context: Context) {
         Log.d(TAG, "onAttach: starts")
         super.onAttach(context)
@@ -97,7 +150,7 @@ class AddEditFragment : Fragment() {
      * (http://developer.android.com/training/basics/fragments/communicating.html)
      * for more information.
      */
-    interface OnSaveClicked{
+    interface OnSaveClicked {
         fun onSaveClicked()
     }
 
@@ -117,6 +170,7 @@ class AddEditFragment : Fragment() {
                 }
             }
     }
+
     override fun onViewStateRestored(savedInstanceState: Bundle?) {
         Log.d(TAG, "onViewStateRestored: called")
         super.onViewStateRestored(savedInstanceState)
