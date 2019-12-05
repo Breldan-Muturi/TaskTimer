@@ -12,15 +12,21 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.android.synthetic.main.fragment_main.*
+import java.lang.RuntimeException
 
 /**
  * A simple [Fragment] subclass.
  */
 private const val TAG = "MainActivityFragment"
-class MainActivityFragment : Fragment() {
+class MainActivityFragment : Fragment(),
+CursorRecyclerViewAdapter.OnTaskClickListener {
+
+    interface OnTaskEdit{
+        fun onTaskEdit(task: Task)
+    }
 
     private val viewModel by lazy { ViewModelProviders.of(activity!!).get(TaskTimerViewModel::class.java) }
-    private val mAdapter = CursorRecyclerViewAdapter(null)
+    private val mAdapter = CursorRecyclerViewAdapter(null, this)
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -33,12 +39,15 @@ class MainActivityFragment : Fragment() {
     override fun onAttach(context: Context) {
         Log.d(TAG, "onAttach: called")
         super.onAttach(context)
-        viewModel.cursor.observe(this, Observer {cursor -> mAdapter.swapCursor(cursor)?.close()})
+        if (context !is OnTaskEdit) {
+            throw RuntimeException("${context.toString()} must implement OnTaskEdit")
+        }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         Log.d(TAG, "onCreate: called")
         super.onCreate(savedInstanceState)
+        viewModel.cursor.observe(this, Observer {cursor -> mAdapter.swapCursor(cursor)?.close()})
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -51,6 +60,18 @@ class MainActivityFragment : Fragment() {
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         Log.d(TAG, "onActivityCreated: called")
         super.onActivityCreated(savedInstanceState)
+    }
+
+    override fun onEditClick(task: Task) {
+        (activity as OnTaskEdit?)?.onTaskEdit(task)
+    }
+
+    override fun onDeleteClick(task: Task) {
+        viewModel.deleteTask(task.id)
+    }
+
+    override fun onTaskLongClick(task: Task) {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
     override fun onViewStateRestored(savedInstanceState: Bundle?) {

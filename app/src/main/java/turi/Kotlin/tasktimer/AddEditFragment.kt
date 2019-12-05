@@ -10,6 +10,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.ViewModelProviders
 import kotlinx.android.synthetic.main.fragment_add_edit.*
 
 private const val TAG = "AddEditFragment"
@@ -27,6 +28,7 @@ private const val ARG_TASK = "task"
 class AddEditFragment : Fragment() {
     private var task: Task? = null
     private var listener: OnSaveClicked? = null
+    private val viewModel by lazy { ViewModelProviders.of(activity!!).get(TaskTimerViewModel::class.java) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         Log.d(TAG, "onCreate: starts")
@@ -59,54 +61,27 @@ class AddEditFragment : Fragment() {
         }
     }
 
-    private fun saveTask() {
-//        Update the database if at least one field is changed
-//        There is no need to hit the database unless this has happened
+    private fun taskFromUi(): Task {
         val sortOrder = if (addedit_sortorder.text.isNotEmpty()) {
             Integer.parseInt(addedit_sortorder.text.toString())
         } else {
             0
         }
-        val values = ContentValues()
-        val task = task
+        val newTask = Task (addedit_name.text.toString(), addedit_description.text.toString(), sortOrder)
+        newTask.id = task?.id ?: 0
+        return newTask
+    }
 
-        if (task != null) {
-            Log.d(TAG, "saveTask: updating an existing task")
-            if (addedit_name.text.toString() != task.name) {
-                values.put(TasksContract.Columns.TASK_NAME, addedit_name.text.toString())
-            }
-            if (addedit_description.text.toString() != task.description) {
-                values.put(
-                    TasksContract.Columns.TASK_DESCRIPTION,
-                    addedit_description.text.toString()
-                )
-            }
-            if (sortOrder != task.sortOrder) {
-                values.put(TasksContract.Columns.TASK_SORT_ORDER, sortOrder)
-            }
-            if (values.size() != 0) {
-                Log.d(TAG, "saveTask: updating task")
-                activity?.contentResolver?.update(
-                    TasksContract.buildUriFromId(task.id),
-                    values, null, null
-                )
-            }
-        } else {
-            Log.d(TAG, "saveTask: adding a new task")
-            if (addedit_name.text.isNotEmpty()) {
-                values.put(TasksContract.Columns.TASK_NAME, addedit_name.text.toString())
-                if (addedit_description.text.isNotEmpty()) {
-                    values.put(
-                        TasksContract.Columns.TASK_DESCRIPTION,
-                        addedit_description.text.toString()
-                    )
-                }
-                values.put(
-                    TasksContract.Columns.TASK_SORT_ORDER,
-                    sortOrder
-                ) // defaults to zero if empty
-                activity?.contentResolver?.insert(TasksContract.CONTENT_URI, values)
-            }
+    private fun saveTask() {
+//      Create a new Task object with details to be saved, then
+//      call the viewModel's SaveTask function to save it.
+//      Task is now a data class so we can compare the new details  with the original task,
+//      and only save if they are different
+        val newTask = taskFromUi()
+        if (newTask != task) {
+            Log.d(TAG, "saveTask: Saving task, id is ${newTask.id}")
+            task = viewModel.saveTask(newTask)
+            Log.d(TAG, "saveTask: id is ${task?.id}")
         }
     }
 
