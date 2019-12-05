@@ -15,7 +15,7 @@
         android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
         android:text="@string/no_task_message"
-        android:textColor="@android:color/tertiary_text_dark"
+        android:textColor="@color/colorAccent"
         android:textSize="22sp"
         android:textStyle="bold"
         app:layout_constraintBottom_toTopOf="@+id/task_list"
