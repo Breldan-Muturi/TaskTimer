@@ -2,6 +2,7 @@ package turi.Kotlin.tasktimer
 
 
 import android.content.Context
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
@@ -18,14 +19,20 @@ import java.lang.RuntimeException
  * A simple [Fragment] subclass.
  */
 private const val TAG = "MainActivityFragment"
-class MainActivityFragment : Fragment(),
-CursorRecyclerViewAdapter.OnTaskClickListener {
+private const val DIALOG_ID_DELETE = 1
+private const val DIALOG_TASK_ID = "task_id"
 
-    interface OnTaskEdit{
+class MainActivityFragment : Fragment(),
+    CursorRecyclerViewAdapter.OnTaskClickListener,
+    AppDialog.DialogEvents {
+
+    interface OnTaskEdit {
         fun onTaskEdit(task: Task)
     }
 
-    private val viewModel by lazy { ViewModelProviders.of(activity!!).get(TaskTimerViewModel::class.java) }
+    private val viewModel by lazy {
+        ViewModelProviders.of(activity!!).get(TaskTimerViewModel::class.java)
+    }
     private val mAdapter = CursorRecyclerViewAdapter(null, this)
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -47,7 +54,7 @@ CursorRecyclerViewAdapter.OnTaskClickListener {
     override fun onCreate(savedInstanceState: Bundle?) {
         Log.d(TAG, "onCreate: called")
         super.onCreate(savedInstanceState)
-        viewModel.cursor.observe(this, Observer {cursor -> mAdapter.swapCursor(cursor)?.close()})
+        viewModel.cursor.observe(this, Observer { cursor -> mAdapter.swapCursor(cursor)?.close() })
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -67,11 +74,28 @@ CursorRecyclerViewAdapter.OnTaskClickListener {
     }
 
     override fun onDeleteClick(task: Task) {
-        viewModel.deleteTask(task.id)
+        val args = Bundle().apply {
+            putInt(DIALOG_ID, DIALOG_ID_DELETE)
+            putString(DIALOG_MESSAGE, getString(R.string.deldiag_message, task.id, task.name))
+            putInt(DIALOG_POSITIVE_RID, R.string.deldiag_positive_caption)
+            putLong(DIALOG_TASK_ID, task.id) //pass the id in the arguments so we can retreive it when we get called back
+        }
+        val dialog = AppDialog()
+        dialog.arguments = args
+        dialog.show(childFragmentManager, null)
     }
 
     override fun onTaskLongClick(task: Task) {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    override fun onPositiveDialogResult(dialogId: Int, args: Bundle) {
+        Log.d(TAG, "onPositiveDialogResult: called with id $dialogId")
+        if (dialogId == DIALOG_ID_DELETE) {
+            val taskId = args.getLong(DIALOG_TASK_ID)
+            if (BuildConfig.DEBUG && taskId == 0L) throw AssertionError("Task ID is Zero")
+            viewModel.deleteTask(taskId)
+        }
     }
 
     override fun onViewStateRestored(savedInstanceState: Bundle?) {
@@ -118,9 +142,6 @@ CursorRecyclerViewAdapter.OnTaskClickListener {
         Log.d(TAG, "onDetach: called")
         super.onDetach()
     }
-
-
-
 
 
 }

@@ -3,6 +3,7 @@ package turi.Kotlin.tasktimer
 import android.app.AlertDialog
 import android.app.Dialog
 import android.content.Context
+import android.content.DialogInterface
 import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatDialogFragment
@@ -96,4 +97,11 @@ class AppDialog : AppCompatDialogFragment() {
         dialogEvents = null
         super.onDetach()
     }
+
+    override fun onCancel(dialog: DialogInterface) {
+        Log.d(TAG,"onCancel: called")
+        val dialogId = arguments!!.getInt(DIALOG_ID)
+//        dialogEvents?.onDialogCancelled(dialogId)
+    }
+
 }
