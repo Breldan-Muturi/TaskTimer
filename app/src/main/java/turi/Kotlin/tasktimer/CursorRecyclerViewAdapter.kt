@@ -14,6 +14,22 @@ import java.lang.IllegalStateException
 class TaskViewHolder(override val containerView: View) :
     RecyclerView.ViewHolder(containerView),
     LayoutContainer {
+    fun bind(task: Task) {
+        tli_name.text = task.name
+        tli_description.text = task.description
+        tli_edit.visibility = View.VISIBLE
+        tli_delete.visibility = View.VISIBLE
+        tli_edit.setOnClickListener {
+            Log.d(TAG, "edit button tapped. task name is ${task.name}")
+        }
+        tli_delete.setOnClickListener {
+            Log.d(TAG, "delete button tapped. task name is ${task.name}")
+        }
+        containerView.setOnLongClickListener {
+            Log.d(TAG, "OnLongClick: task name is ${task.name}")
+            true
+        }
+    }
 }
 
 private const val TAG = "CursorRecyclerViewAdapt"
@@ -48,11 +64,7 @@ class CursorRecyclerViewAdapter(private var cursor: Cursor?) :
             )
 //            Remember the ID isn't set in the constructor
             task.id = cursor.getLong(cursor.getColumnIndex(TasksContract.Columns.ID))
-
-            holder.tli_name.text = task.name
-            holder.tli_description.text = task.description
-            holder.tli_edit.visibility = View.VISIBLE  //TODO: add onClick
-            holder.tli_delete.visibility = View.VISIBLE //TODO: add onClick
+            holder.bind(task)
         }
 
     }
@@ -68,6 +80,7 @@ class CursorRecyclerViewAdapter(private var cursor: Cursor?) :
         Log.d(TAG, "getItemCount: returning $count")
         return count
     }
+
     /**
      * Swap in a new cursor, returning the old cursor.
      * The returned old cursor is *not* closed.
@@ -83,12 +96,12 @@ class CursorRecyclerViewAdapter(private var cursor: Cursor?) :
         val numItems = itemCount
         val oldCursor = cursor
         cursor = newCursor
-        if ( newCursor != null) {
+        if (newCursor != null) {
 //            notify the observers about the new cursor
             notifyDataSetChanged()
         } else {
 //            notify the observers about the lack of a data set
-            notifyItemRangeRemoved(0,numItems)
+            notifyItemRangeRemoved(0, numItems)
         }
         return oldCursor
     }
