@@ -29,10 +29,10 @@ class AppProvider : ContentProvider() {
         val matcher = UriMatcher(UriMatcher.NO_MATCH)
 
         //e.g content://turi.Kotlin.tasktimer.provider/Tasks
-        matcher.addURI(CONTENT_AUTHORITY, TasksContract.TABLE_NAME, TASKS);
+        matcher.addURI(CONTENT_AUTHORITY, TasksContract.TABLE_NAME, TASKS)
         //e.g content://turi.Kotlin.tasktimer.provider/Tasks/8
         matcher.addURI(CONTENT_AUTHORITY, "${TasksContract.TABLE_NAME}/#", TASKS_ID)
-        matcher.addURI(CONTENT_AUTHORITY, TimingsContract.TABLE_NAME, TIMINGS);
+        matcher.addURI(CONTENT_AUTHORITY, TimingsContract.TABLE_NAME, TIMINGS)
         matcher.addURI(CONTENT_AUTHORITY, "${TimingsContract.TABLE_NAME}/#", TIMINGS_ID)
 //        matcher.addURI(CONTENT_AUTHORITY, DuratoionsContract.TABLE_NAME, TASK_DURATIONS);
 //        matcher.addURI(CONTENT_AUTHORITY, "${DuratoionsContract.TABLE_NAME}/#", TASK_DURATIONS_ID)
