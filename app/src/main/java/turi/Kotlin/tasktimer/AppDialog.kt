@@ -29,6 +29,7 @@ class AppDialog : AppCompatDialogFragment() {
 
     override fun onAttach(context: Context) {
         Log.d(TAG, "onAttach called: context is $context")
+        super.onAttach(context)
         //Activities/Fragments containing this fragments must implement it's callbacks
         dialogEvents = try {
             //Is there a parent fragment , if so that will be what we callback
