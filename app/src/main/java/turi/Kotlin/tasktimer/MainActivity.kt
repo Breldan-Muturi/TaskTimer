@@ -1,12 +1,19 @@
 package turi.Kotlin.tasktimer
 
+import android.annotation.SuppressLint
+import android.content.ActivityNotFoundException
+import android.content.Intent
 import android.content.res.Configuration
+import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import android.widget.TextView
+import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.content_main.*
@@ -20,6 +27,8 @@ class MainActivity : AppCompatActivity(),
     AppDialog.DialogEvents {
     //  Whether the activity is in two pane mode i.e in landscape orientatoin or on a tablet
     private var mTwoPane = false
+    //module scope because we'll need to dismiss it in onStop (e.g when orientation changes) to avoid memory leaks
+    private var aboutDialog: AlertDialog? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         Log.d(TAG, "onCreate: starts")
@@ -79,6 +88,7 @@ class MainActivity : AppCompatActivity(),
         when (item.itemId) {
             R.id.menumain_addTask -> taskEditRequest(null)
 //            R.id.menumain_settings -> true
+            R.id.menumain_showAbout -> showAboutDialog()
             android.R.id.home -> {
                 Log.d(TAG, "onOptionsItemSelected: home button pressed")
                 val fragment = findFragmentById(R.id.task_details_container)
@@ -95,6 +105,37 @@ class MainActivity : AppCompatActivity(),
             }
         }
         return super.onOptionsItemSelected(item)
+    }
+
+    @SuppressLint("InflateParams")
+    private fun showAboutDialog() {
+        val messageView = layoutInflater.inflate(R.layout.about, null, false)
+        val  builder = AlertDialog.Builder(this)
+        builder.setTitle(R.string.app_name)
+        builder.setIcon(R.mipmap.ic_launcher)
+        builder.setPositiveButton (R.string.ok){ _, _ ->
+            Log.d(TAG,"onClick: Entering messageView onclick")
+            if (aboutDialog != null && aboutDialog?.isShowing == true) {
+                aboutDialog?.dismiss()
+            }
+        }
+        aboutDialog = builder.setView(messageView).create()
+        aboutDialog?.setCanceledOnTouchOutside(true)
+        val aboutVersion = messageView.findViewById(R.id.about_version) as TextView
+        aboutVersion.text = BuildConfig.VERSION_NAME
+        //Use  nullable type the textView wont appear in API 21 or higher
+        val aboutUrl: TextView? = messageView.findViewById(R.id.about_url)
+        aboutUrl?.setOnClickListener { v ->
+            val intent = Intent(Intent.ACTION_VIEW)
+            val s = (v as TextView).text.toString()
+            intent.data = Uri.parse(s)
+            try {
+                startActivity(intent)
+            } catch (e: ActivityNotFoundException) {
+                Toast.makeText(this@MainActivity, getString(R.string.about_url_error), Toast.LENGTH_LONG).show()
+            }
+        }
+        aboutDialog?.show()
     }
 
     private fun taskEditRequest(task: Task?) {
@@ -169,6 +210,9 @@ class MainActivity : AppCompatActivity(),
     override fun onStop() {
         Log.d(TAG, "onStop: called")
         super.onStop()
+        if(aboutDialog?.isShowing == true) {
+            aboutDialog?.dismiss()
+        }
     }
 
     override fun onDestroy() {
